@@ -70,10 +70,6 @@ class CustomCollate:
         mol_drug = [x['mol_drug'] for x in batch]
         mol_frag = [x['mol_frag'] for x in batch]
         graph_drug = [x['graph_drug'] for x in batch]
-        # graph_drug = Batch.from_data_list(graph_drug)
-        # batch_frag = torch.LongTensor([len(x['graph_frag']) for x in batch])
-        # graph_frag = [frag for x in batch for frag in x['graph_frag']]
-        # graph_frag = Batch.from_data_list(graph_frag)
         graph_frag = [x['graph_frag'] for x in batch]
         label = [x['label'] for x in batch]
         label = [torch.tensor(l, dtype=torch.int64) for l in label]

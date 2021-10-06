@@ -40,7 +40,7 @@ class GraphEncoder(nn.Module):
             x = F.dropout(x, p=self.dropout, training=self.training)
             x = self.act(x)
         x = self.out_lin(x)
-        x = scatter(x, data.batch, dim=0, reduce="sum")
+        x = scatter(x, data.batch, dim=0, reduce="mean")
         return x
 
 

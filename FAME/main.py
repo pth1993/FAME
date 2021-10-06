@@ -52,9 +52,9 @@ data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv', 'data
                            ignore_idx=val_ignore_idx)
 data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn=CustomCollate())
 
-# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv'],
+# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
 #                              atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-#                              label_file=['data/lincs/lincs_label_train.pkl'], ignore_idx=[])
+#                              label_file=['data/lincs/lincs_label_val.pkl'], ignore_idx=[])
 # data_loader_train = DataLoader(data_train, batch_size=64, shuffle=True, collate_fn=CustomCollate())
 # data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
 #                            atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
@@ -97,7 +97,7 @@ for e in range(n_epoch):
             nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
         else:
             nll, kld = model.loss(output, label, batch_frag, mu, logvar)
-        w = 0.01
+        w = 0.1
         loss = nll + w * kld
         loss.backward()
         optimizer.step()
@@ -128,7 +128,7 @@ for e in range(n_epoch):
                 nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
             else:
                 nll, kld = model.loss(output, label, batch_frag, mu, logvar)
-            w = 0.01
+            w = 0.1
             loss = nll + w * kld
             val_loss += loss.item()
             val_nll_loss += nll.item()
@@ -145,7 +145,7 @@ for e in range(n_epoch):
         else model.graph_encoder.state_dict(), 'decoder_state_dict': model.module.graph_decoder.state_dict()
         if isinstance(model, nn.DataParallel) else model.graph_decoder.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict()},
-                   'saved_model/pt2/%s_%d.ckpt' % (model_name, best_epoch))
+                   'saved_model/pt3/%s_%d.ckpt' % (model_name, best_epoch))
 
 print("Loss / NLL / KLD on val set by epoch %d (best val epoch): %.4f - %.4f - %.4f"
       % (best_epoch + 1, val_loss_list[best_epoch], val_nll_loss_list[best_epoch],
@@ -155,7 +155,7 @@ df = pd.DataFrame(list(zip(train_loss_list, train_nll_loss_list, train_kld_loss_
                            val_nll_loss_list, val_kld_loss_list)),
                   columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
                   index=np.arange(len(train_loss_list))+1)
-df.to_csv('output/pt2/%s' % log_file)
+df.to_csv('output/pt3/%s' % log_file)
 
 end_time = datetime.now()
 print(end_time - start_time)

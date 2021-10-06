@@ -60,7 +60,6 @@ class GraphDecoder(nn.Module):
 
     def forward(self, graph, label, length, cond):
         n_batch, n_fragment = label.shape
-        print(n_batch)
         cnt = 0
         # Calculate h0
         h_0 = self.cond_2_hid(cond)
@@ -76,8 +75,6 @@ class GraphDecoder(nn.Module):
             frag_embedding_padded[i, 1:(1 + length[i]), :] = frag_embedding[cnt:(cnt + length[i])]
             cnt += length[i]
         frag_embedding = frag_embedding_padded[:, :-1, :]
-        print(frag_embedding.shape)
-        print(cond.shape)
         frag_embedding = torch.cat([frag_embedding, cond], dim=-1)
         # Prepare input for rnn
         frag_embedding = nn.utils.rnn.pack_padded_sequence(frag_embedding, length.cpu(), batch_first=True,

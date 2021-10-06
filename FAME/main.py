@@ -33,22 +33,22 @@ atom_dict = read_pickle(atom_file)
 bond_dict = read_pickle(bond_file)
 fragment_dict = read_pickle(fragment_file)
 
-data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv', 'data/chembl/chembl_fragment_train.csv'],
-                             atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-                             label_file=['data/lincs/lincs_label_train.pkl', 'data/chembl/chembl_label_train.pkl'])
-data_loader_train = DataLoader(data_train, batch_size=256, shuffle=True, collate_fn=CustomCollate())
-data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv', 'data/chembl/chembl_fragment_val.csv'],
-                           atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-                           label_file=['data/lincs/lincs_label_val.pkl', 'data/chembl/chembl_label_val.pkl'])
-data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn=CustomCollate())
-# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv', 'data/chembl/chembl_fragment_train.csv'],
 #                              atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-#                              label_file=['data/lincs/lincs_label_val.pkl'])
-# data_loader_train = DataLoader(data_train, batch_size=64, shuffle=True, collate_fn=CustomCollate())
-# data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+#                              label_file=['data/lincs/lincs_label_train.pkl', 'data/chembl/chembl_label_train.pkl'])
+# data_loader_train = DataLoader(data_train, batch_size=256, shuffle=True, collate_fn=CustomCollate())
+# data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv', 'data/chembl/chembl_fragment_val.csv'],
 #                            atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-#                            label_file=['data/lincs/lincs_label_val.pkl'])
-# data_loader_val = DataLoader(data_val, batch_size=64, shuffle=False, collate_fn=CustomCollate())
+#                            label_file=['data/lincs/lincs_label_val.pkl', 'data/chembl/chembl_label_val.pkl'])
+# data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn=CustomCollate())
+data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+                             atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
+                             label_file=['data/lincs/lincs_label_val.pkl'])
+data_loader_train = DataLoader(data_train, batch_size=64, shuffle=True, collate_fn=CustomCollate())
+data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+                           atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
+                           label_file=['data/lincs/lincs_label_val.pkl'])
+data_loader_val = DataLoader(data_val, batch_size=64, shuffle=False, collate_fn=CustomCollate())
 
 model = FAME(num_node_features=len(atom_dict['c2i']), num_edge_features=len(bond_dict['c2i']), n_gnn_layers=5,
              gnn_hid_dim=64, latent_dim=64, emb_dim=32, out_dim=len(fragment_dict['c2i']),

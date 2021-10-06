@@ -6,7 +6,7 @@
 # Specify the number of nodes and processors and gpus per nodes
 #SBATCH --nodes=1 --ntasks-per-node=16 --gpus-per-node=2
 # Specify the amount of time for this job
-#SBATCH --time=2:00:00
+#SBATCH --time=0:10:00
 # Specify the maximum amount of physical memory required
 #SBATCH --mem=128GB
 

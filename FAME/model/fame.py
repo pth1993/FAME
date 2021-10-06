@@ -97,6 +97,7 @@ class FAME(nn.Module):
         self.graph_decoder = GraphDecoder(num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, emb_dim,
                                           latent_dim, n_rnn_layers, rnn_hid_dim, out_dim, dropout, device)
         self.latent_dim = latent_dim
+        self.device = device
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)

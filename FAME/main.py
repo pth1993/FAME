@@ -23,10 +23,10 @@ torch.backends.cudnn.deterministic = True
 atom_file = 'data/atom_dict.pkl'
 bond_file = 'data/bond_dict.pkl'
 fragment_file = 'data/fragment_dict.pkl'
-n_epoch = 20
+n_epoch = 50
 model_name = 'FAME'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-multi_gpu = True
+multi_gpu = False
 log_file = 'log_%s.csv' % model_name
 
 train_ignore_idx = [438762, 679501, 1226007, 1234027, 1089044, 915221, 1281976, 1296419, 1281848, 1310072, 1234976,
@@ -41,27 +41,28 @@ atom_dict = read_pickle(atom_file)
 bond_dict = read_pickle(bond_file)
 fragment_dict = read_pickle(fragment_file)
 
-# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv', 'data/chembl/chembl_fragment_train.csv'],
-#                              atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-#                              label_file=['data/lincs/lincs_label_train.pkl', 'data/chembl/chembl_label_train.pkl'],
-#                              ignore_idx=train_ignore_idx)
-# data_loader_train = DataLoader(data_train, batch_size=256, shuffle=True, collate_fn=CustomCollate())
-# data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv', 'data/chembl/chembl_fragment_val.csv'],
-#                            atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-#                            label_file=['data/lincs/lincs_label_val.pkl', 'data/chembl/chembl_label_val.pkl'],
-#                            ignore_idx=val_ignore_idx)
-# data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn=CustomCollate())
-data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv'],
+data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv', 'data/chembl/chembl_fragment_train.csv'],
                              atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-                             label_file=['data/lincs/lincs_label_train.pkl'], ignore_idx=[])
-data_loader_train = DataLoader(data_train, batch_size=64, shuffle=True, collate_fn=CustomCollate())
-data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+                             label_file=['data/lincs/lincs_label_train.pkl', 'data/chembl/chembl_label_train.pkl'],
+                             ignore_idx=train_ignore_idx)
+data_loader_train = DataLoader(data_train, batch_size=256, shuffle=True, collate_fn=CustomCollate())
+data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv', 'data/chembl/chembl_fragment_val.csv'],
                            atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-                           label_file=['data/lincs/lincs_label_val.pkl'], ignore_idx=[])
-data_loader_val = DataLoader(data_val, batch_size=64, shuffle=False, collate_fn=CustomCollate())
+                           label_file=['data/lincs/lincs_label_val.pkl', 'data/chembl/chembl_label_val.pkl'],
+                           ignore_idx=val_ignore_idx)
+data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn=CustomCollate())
+
+# data_train = MoleculeDataset(data_file=['data/lincs/lincs_fragment_train.csv'],
+#                              atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
+#                              label_file=['data/lincs/lincs_label_train.pkl'], ignore_idx=[])
+# data_loader_train = DataLoader(data_train, batch_size=64, shuffle=True, collate_fn=CustomCollate())
+# data_val = MoleculeDataset(data_file=['data/lincs/lincs_fragment_val.csv'],
+#                            atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
+#                            label_file=['data/lincs/lincs_label_val.pkl'], ignore_idx=[])
+# data_loader_val = DataLoader(data_val, batch_size=64, shuffle=False, collate_fn=CustomCollate())
 
 model = FAME(num_node_features=len(atom_dict['c2i']), num_edge_features=len(bond_dict['c2i']), n_gnn_layers=5,
-             gnn_hid_dim=64, latent_dim=32, emb_dim=32, out_dim=len(fragment_dict['c2i']),
+             gnn_hid_dim=64, latent_dim=64, emb_dim=32, out_dim=len(fragment_dict['c2i']),
              n_rnn_layers=2, rnn_hid_dim=32, dropout=0.1, device=device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
@@ -84,14 +85,14 @@ for e in range(n_epoch):
     train_nll_loss = 0
     train_kld_loss = 0
     for i, b in enumerate(tqdm(data_loader_train)):
-        graph_drug = b['graph_drug']
-        graph_frag = b['graph_frag']
-        # graph_drug = b['graph_drug'].to(device)
-        # graph_frag = b['graph_frag'].to(device)
-        # batch_frag = b['batch_frag']
+        # graph_drug = b['graph_drug']
+        # graph_frag = b['graph_frag']
+        graph_drug = b['graph_drug'].to(device)
+        graph_frag = b['graph_frag'].to(device)
+        batch_frag = b['batch_frag']
         label = b['label'].to(device)
-        output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, label)
-        # output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, label)
+        # output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, label)
+        output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, label)
         if isinstance(model, nn.DataParallel):
             nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
         else:
@@ -115,14 +116,14 @@ for e in range(n_epoch):
         val_nll_loss = 0
         val_kld_loss = 0
         for i, b in enumerate(tqdm(data_loader_val)):
-            graph_drug = b['graph_drug']
-            graph_frag = b['graph_frag']
-            # graph_drug = b['graph_drug'].to(device)
-            # graph_frag = b['graph_frag'].to(device)
-            # batch_frag = b['batch_frag']
+            # graph_drug = b['graph_drug']
+            # graph_frag = b['graph_frag']
+            graph_drug = b['graph_drug'].to(device)
+            graph_frag = b['graph_frag'].to(device)
+            batch_frag = b['batch_frag']
             label = b['label'].to(device)
-            output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, label)
-            # output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, label)
+            # output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, label)
+            output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, label)
             if isinstance(model, nn.DataParallel):
                 nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
             else:

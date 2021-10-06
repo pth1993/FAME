@@ -45,7 +45,7 @@ class GraphEncoder(nn.Module):
 
 class GraphDecoder(nn.Module):
     def __init__(self, num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, emb_dim, cond_dim, n_rnn_layers,
-                 rnn_hid_dim, out_dim, dropout):
+                 rnn_hid_dim, out_dim, dropout, device):
         super(GraphDecoder, self).__init__()
         self.fragment_embed = GraphEncoder(num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, emb_dim,
                                            dropout)
@@ -56,6 +56,7 @@ class GraphDecoder(nn.Module):
         self.n_rnn_layers = n_rnn_layers
         self.emb_dim = emb_dim
         self.dropout = dropout
+        self.device = device
 
     def forward(self, graph, label, length, cond):
         n_batch, n_fragment = label.shape
@@ -69,7 +70,7 @@ class GraphDecoder(nn.Module):
         # Calculate fragment embedding
         frag_embedding = self.fragment_embed(graph)
         # Reshape fragment embedding
-        frag_embedding_padded = torch.zeros(n_batch, n_fragment+1, self.emb_dim, dtype=torch.float32)
+        frag_embedding_padded = torch.zeros(n_batch, n_fragment+1, self.emb_dim, dtype=torch.float32).to(self.device)
         for i in range(n_batch):
             frag_embedding_padded[i, 1:(1 + length[i]), :] = frag_embedding[cnt:(cnt + length[i])]
             cnt += length[i]
@@ -86,12 +87,12 @@ class GraphDecoder(nn.Module):
 
 class FAME(nn.Module):
     def __init__(self, num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, latent_dim, emb_dim, out_dim,
-                 n_rnn_layers, rnn_hid_dim, dropout):
+                 n_rnn_layers, rnn_hid_dim, dropout, device):
         super(FAME, self).__init__()
         self.graph_encoder = GraphEncoder(num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim,
                                           latent_dim * 2, dropout)
         self.graph_decoder = GraphDecoder(num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, emb_dim,
-                                          latent_dim, n_rnn_layers, rnn_hid_dim, out_dim, dropout)
+                                          latent_dim, n_rnn_layers, rnn_hid_dim, out_dim, dropout, device)
         self.latent_dim = latent_dim
 
     def reparameterize(self, mu, logvar):
@@ -114,7 +115,3 @@ class FAME(nn.Module):
             recon_loss = recon_loss.mean()
         kld_loss = -0.5 * torch.mean(torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=-1))
         return recon_loss, kld_loss
-
-
-
-

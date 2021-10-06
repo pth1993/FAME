@@ -52,7 +52,7 @@ data_loader_val = DataLoader(data_val, batch_size=256, shuffle=False, collate_fn
 
 model = FAME(num_node_features=len(atom_dict['c2i']), num_edge_features=len(bond_dict['c2i']), n_gnn_layers=5,
              gnn_hid_dim=64, latent_dim=64, emb_dim=32, out_dim=len(fragment_dict['c2i']),
-             n_rnn_layers=2, rnn_hid_dim=32, dropout=0.1)
+             n_rnn_layers=2, rnn_hid_dim=32, dropout=0.1, device=device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 

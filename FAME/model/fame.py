@@ -104,7 +104,7 @@ class FAME(nn.Module):
         return z
 
     def forward(self, graph_drug, graph_frag, label):
-        print(len(graph_drug), len(graph_frag), print(len(label)))
+        print(len(graph_drug), len(graph_frag), len(label))
         graph_drug = Batch.from_data_list(graph_drug).to(self.device)
         batch_frag = torch.LongTensor([len(g) for g in graph_frag])
         graph_frag = [frag for x in graph_frag for frag in x]

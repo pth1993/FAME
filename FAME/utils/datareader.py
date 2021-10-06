@@ -5,7 +5,7 @@ from torch_geometric.data import Batch
 
 
 class MoleculeDataset(Dataset):
-    def __init__(self, data_file, atom_dict, bond_dict, fragment_dict, label_file):
+    def __init__(self, data_file, atom_dict, bond_dict, fragment_dict, label_file, ignore_idx):
         self.atom_dict = atom_dict
         self.bond_dict = bond_dict
         self.fragment_dict = fragment_dict
@@ -18,18 +18,28 @@ class MoleculeDataset(Dataset):
             self.smiles_frag += smiles_frag
             self.mol_drug += mol_drug
             self.mol_frag += mol_frag
+        label_new, smiles_drug_new, smiles_frag_new,mol_drug_new, mol_frag_new = [], [], [], [], []
+        for i in range(len(self.label)):
+            if i not in ignore_idx:
+                label_new.append(self.label[i])
+                smiles_drug_new.append(self.smiles_drug[i])
+                smiles_frag_new.append(self.smiles_frag[i])
+                mol_drug_new.append(self.mol_drug[i])
+                mol_frag_new.append(self.mol_frag[i])
+        self.label = label_new
+        self.smiles_drug = smiles_drug_new
+        self.smiles_frag = smiles_frag_new
+        self.mol_drug = mol_drug_new
+        self.mol_frag = mol_frag_new
 
     def __len__(self):
         return len(self.smiles_drug)
 
     def __getitem__(self, idx):
-        try:
-            self.graph_drug = convert_mol_2_graph_pyg(self.mol_drug[idx], self.atom_dict, self.bond_dict)
-            self.graph_frag = [convert_mol_2_graph_pyg(frag, self.atom_dict, self.bond_dict) for frag in self.mol_frag[idx]]
-        except:
-            print(idx)
-            self.graph_drug = convert_mol_2_graph_pyg(self.mol_drug[0], self.atom_dict, self.bond_dict)
-            self.graph_frag = [convert_mol_2_graph_pyg(frag, self.atom_dict, self.bond_dict) for frag in self.mol_frag[0]]
+        self.graph_drug = convert_mol_2_graph_pyg(self.mol_drug[idx], self.atom_dict, self.bond_dict)
+        self.graph_frag = [convert_mol_2_graph_pyg(frag, self.atom_dict, self.bond_dict) for frag in self.mol_frag[idx]]
+        self.graph_drug = convert_mol_2_graph_pyg(self.mol_drug[0], self.atom_dict, self.bond_dict)
+        self.graph_frag = [convert_mol_2_graph_pyg(frag, self.atom_dict, self.bond_dict) for frag in self.mol_frag[0]]
         sample = {'smiles_drug': self.smiles_drug[idx], 'smiles_frag': self.smiles_frag[idx],
                   'mol_drug': self.mol_drug[idx], 'mol_frag': self.mol_frag[idx], 'graph_drug': self.graph_drug,
                   'graph_frag': self.graph_frag, 'label': self.label[idx]}

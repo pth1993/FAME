@@ -14,7 +14,8 @@ class GraphEncoder(nn.Module):
         self.convs.append(GINEConv(GraphEncoder.MLP(num_node_features, hid_dim)))
         for _ in range(1, n_layers):
             self.convs.append(GINEConv(GraphEncoder.MLP(hid_dim, hid_dim)))
-        self.out_lin = Linear(hid_dim, out_dim)
+        # self.out_lin = Linear(hid_dim, out_dim)
+        self.out_lin = Sequential(Linear(hid_dim, out_dim), nn.ReLU(inplace=True), Linear(out_dim, out_dim))
         self.edge_lins = ModuleList()
         self.edge_lins.append(nn.Linear(num_edge_features, num_node_features))
         for _ in range(1, n_layers):
@@ -39,8 +40,10 @@ class GraphEncoder(nn.Module):
             x = self.convs[i](x, edge_index, edge_attr_transform)
             x = F.dropout(x, p=self.dropout, training=self.training)
             x = self.act(x)
+        # x = self.out_lin(x)
+        # x = scatter(x, data.batch, dim=0, reduce="mean")
+        x = scatter(x, data.batch, dim=0, reduce="sum")
         x = self.out_lin(x)
-        x = scatter(x, data.batch, dim=0, reduce="mean")
         return x
 
 

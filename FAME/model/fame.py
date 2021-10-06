@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch_geometric.nn import GINEConv
 from torch_scatter import scatter
 from torch.nn import ModuleList, Sequential, Linear, BatchNorm1d, ReLU
+from torch_geometric.data import Batch
 
 
 class GraphEncoder(nn.Module):
@@ -102,11 +103,15 @@ class FAME(nn.Module):
         z = mu + eps * std
         return z
 
-    def forward(self, graph_drug, graph_frag, batch_frag, label):
+    def forward(self, graph_drug, graph_frag, label):
+        graph_drug = Batch.from_data_list(graph_drug).to(self.device)
+        batch_frag = torch.LongTensor([len(g) for g in graph_frag])
+        graph_frag = [frag for x in graph_frag for frag in x]
+        graph_frag = Batch.from_data_list(graph_frag).to(self.device)
         mu, log_var = torch.split(self.graph_encoder(graph_drug), self.latent_dim, -1)
         latent = self.reparameterize(mu, log_var)
         output = self. graph_decoder(graph_frag, label, batch_frag, latent)
-        return output, mu, log_var
+        return output, mu, log_var, batch_frag
 
     def loss(self, recon_seq, label_seq, length, mu, logvar, reduce=True):
         recon_loss = nn.CrossEntropyLoss(ignore_index=0, reduction='none') \

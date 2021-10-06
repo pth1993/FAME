@@ -46,6 +46,23 @@ class MoleculeDataset(Dataset):
         return sample
 
 
+# class CustomCollate:
+#     def __call__(self, batch):
+#         smiles_drug = [x['smiles_drug'] for x in batch]
+#         smiles_frag = [x['smiles_frag'] for x in batch]
+#         mol_drug = [x['mol_drug'] for x in batch]
+#         mol_frag = [x['mol_frag'] for x in batch]
+#         graph_drug = [x['graph_drug'] for x in batch]
+#         graph_drug = Batch.from_data_list(graph_drug)
+#         batch_frag = torch.LongTensor([len(x['graph_frag']) for x in batch])
+#         graph_frag = [frag for x in batch for frag in x['graph_frag']]
+#         graph_frag = Batch.from_data_list(graph_frag)
+#         label = [x['label'] for x in batch]
+#         label = [torch.tensor(l, dtype=torch.int64) for l in label]
+#         label_padded = torch.nn.utils.rnn.pad_sequence(label, batch_first=True, padding_value=pad_idx)
+#         return {'smiles_drug': smiles_drug, 'smiles_frag': smiles_frag, 'mol_drug': mol_drug, 'mol_frag': mol_frag,
+#                 'graph_drug': graph_drug, 'graph_frag': graph_frag, 'batch_frag': batch_frag, 'label': label_padded}
+
 class CustomCollate:
     def __call__(self, batch):
         smiles_drug = [x['smiles_drug'] for x in batch]
@@ -53,12 +70,13 @@ class CustomCollate:
         mol_drug = [x['mol_drug'] for x in batch]
         mol_frag = [x['mol_frag'] for x in batch]
         graph_drug = [x['graph_drug'] for x in batch]
-        graph_drug = Batch.from_data_list(graph_drug)
-        batch_frag = torch.LongTensor([len(x['graph_frag']) for x in batch])
-        graph_frag = [frag for x in batch for frag in x['graph_frag']]
-        graph_frag = Batch.from_data_list(graph_frag)
+        # graph_drug = Batch.from_data_list(graph_drug)
+        # batch_frag = torch.LongTensor([len(x['graph_frag']) for x in batch])
+        # graph_frag = [frag for x in batch for frag in x['graph_frag']]
+        # graph_frag = Batch.from_data_list(graph_frag)
+        graph_frag = [x['graph_frag'] for x in batch]
         label = [x['label'] for x in batch]
         label = [torch.tensor(l, dtype=torch.int64) for l in label]
         label_padded = torch.nn.utils.rnn.pad_sequence(label, batch_first=True, padding_value=pad_idx)
         return {'smiles_drug': smiles_drug, 'smiles_frag': smiles_frag, 'mol_drug': mol_drug, 'mol_frag': mol_frag,
-                'graph_drug': graph_drug, 'graph_frag': graph_frag, 'batch_frag': batch_frag, 'label': label_padded}
+                'graph_drug': graph_drug, 'graph_frag': graph_frag, 'label': label_padded}

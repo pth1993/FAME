@@ -1,0 +1,25 @@
+#!/bin/bash
+# This is a sample PBS script file to train a simple convnet on the MNIST dataset.
+
+# Set job name
+#SBATCH --job-name=FAME
+# Specify the number of nodes and processors and gpus per nodes
+#SBATCH --nodes=1 --ntasks-per-node=16 --gpus-per-node=2
+# Specify the amount of time for this job
+#SBATCH --time=2:00:00
+# Specify the maximum amount of physical memory required
+#SBATCH --mem=64GB
+
+# Specify an account when more than one available
+#SBATCH --account=PCON0023
+# Enable email notification
+#SBATCH --mail-user=pth1993
+
+# Load modules: python/3.6-conda5.2 cuda/9.2.88
+module load python/3.7-2019.10
+module load cuda/11.1.1
+source activate molgen
+
+## Do your things
+cd $SLURM_SUBMIT_DIR # Goto the directory where the job is submitted
+python main.py

@@ -113,7 +113,7 @@ class FAME(nn.Module):
     def loss(self, recon_seq, label_seq, length, mu, logvar, reduce=True):
         recon_loss = nn.CrossEntropyLoss(ignore_index=0, reduction='none') \
             (recon_seq.reshape(-1, recon_seq.shape[-1]), label_seq.reshape(-1))
-        recon_loss = (recon_loss.reshape(label_seq.shape[0], -1).sum(dim=-1) / length)
+        recon_loss = (recon_loss.reshape(label_seq.shape[0], -1).sum(dim=-1) / length.to(self.device))
         if reduce:
             recon_loss = recon_loss.mean()
         kld_loss = -0.5 * torch.mean(torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=-1))

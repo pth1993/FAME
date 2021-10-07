@@ -38,13 +38,12 @@ def read_pickle(input_file):
     return output
 
 
-def read_lincs_mol_data(input_file, filter=None):
+def read_lincs_mol_data(input_file):
     data = pd.read_csv(input_file)
     data = data[data.pert_iname != filter]
-    smiles_string = data['smiles'].tolist()
     gene_expression = data['gene_expression'].tolist()
     gene_expression = [ast.literal_eval(g) for g in gene_expression]
-    return gene_expression, smiles_string
+    return gene_expression
 
 
 def read_lincs_xpr_data(input_file):

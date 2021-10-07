@@ -1,1 +1,3 @@
-from .fame import GraphEncoder, FAME
+from .fame import FAME
+from .cfame import CFAME
+

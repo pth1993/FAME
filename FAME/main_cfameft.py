@@ -257,8 +257,8 @@ with torch.no_grad():
 # write_mol_to_file(output, 'output/ft1/mol_test_%s.csv' % model_name)
 # write_mol_to_file(output_ext, 'output/ft1/mol_test_ext_%s.csv' % model_name)
 
-output = read_mol_from_file('output/ft/mol_test_%s.csv' % model_name, 400)
-output_ext = read_mol_from_file('output/ft/mol_test_ext_%s.csv' % model_name, 4900)
+output = read_mol_from_file('output/ft1/mol_test_%s.csv' % model_name, 400)
+output_ext = read_mol_from_file('output/ft1/mol_test_ext_%s.csv' % model_name, 4900)
 output_score = metric.calculate_metric_internal(refs, output, trained_smiles, loss, fcd)
 output_score['external_fcd'], output_score['external_jac'] = \
     metric.calculate_metric_external(refs_ext_fcd, refs_ext_fp, output_ext, fcd)

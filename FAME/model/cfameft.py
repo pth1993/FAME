@@ -78,8 +78,8 @@ class JointGraphEncoderFT(nn.Module):
         super(JointGraphEncoderFT, self).__init__()
         self.graph_encoder = GraphEncoder(num_node_features, num_edge_features, n_layers, hid_dim, out_dim_pt, dropout)
         self.graph_encoder.load_state_dict(checkpoint)
-        for p in self.graph_encoder.parameters():
-            p.requires_grad = False
+        # for p in self.graph_encoder.parameters():
+        #     p.requires_grad = False
         self.ft_layer = nn.Sequential(nn.Linear(out_dim_pt, 64), nn.BatchNorm1d(64), nn.LeakyReLU(),
                                       nn.Linear(64, out_dim))
         self.ge_encoder = GEEncoder(out_dim)
@@ -187,8 +187,8 @@ class GraphDecoderFT(nn.Module):
         self.graph_decoder = GraphDecoder(num_node_features, num_edge_features, n_gnn_layers, gnn_hid_dim, emb_dim,
                                           cond_dim_pt, n_rnn_layers, rnn_hid_dim, out_dim, dropout, device)
         self.graph_decoder.load_state_dict(checkpoint)
-        for p in self.graph_decoder.parameters():
-            p.requires_grad = False
+        # for p in self.graph_decoder.parameters():
+        #     p.requires_grad = False
         self.ft_layer = nn.Sequential(nn.Linear(cond_dim, 64), nn.LeakyReLU(), nn.Linear(64, cond_dim_pt))
 
     def forward(self, graph, label, length, cond):

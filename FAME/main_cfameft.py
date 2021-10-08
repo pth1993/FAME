@@ -163,7 +163,7 @@ for e in range(n_epoch):
             best_epoch = e
             torch.save({'model_state_dict': model.module.state_dict() if isinstance(model, nn.DataParallel)
             else model.state_dict(), 'optimizer_state_dict': optimizer.state_dict()},
-                       'saved_model/ft/%s_%d.ckpt' % (model_name, best_epoch))
+                       'saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch))
 
     with torch.no_grad():
         test_loss = 0
@@ -199,15 +199,15 @@ df = pd.DataFrame(list(zip(train_loss_list, train_nll_loss_list, train_kld_loss_
                            val_nll_loss_list, val_kld_loss_list)),
                   columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
                   index=np.arange(len(train_loss_list))+1)
-df.to_csv('output/ft/%s' % log_file)
+df.to_csv('output/ft1/%s' % log_file)
 
 best_epoch = 7
 # Evaluation
 if isinstance(model, nn.DataParallel):
-    checkpoint = torch.load('saved_model/ft/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+    checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
     model.module.load_state_dict(checkpoint['model_state_dict'])
 else:
-    checkpoint = torch.load('saved_model/ft/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+    checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 with torch.no_grad():
@@ -252,8 +252,8 @@ with torch.no_grad():
         refs_ext_fp += [data_excapedb[t]['morgan'] for t in target]
         refs_ext_fcd += [data_excapedb[t]['pref'] for t in target]
 
-write_mol_to_file(output, 'output/ft/mol_test_%s.csv' % model_name)
-write_mol_to_file(output_ext, 'output/ft/mol_test_ext_%s.csv' % model_name)
+write_mol_to_file(output, 'output/ft1/mol_test_%s.csv' % model_name)
+write_mol_to_file(output_ext, 'output/ft1/mol_test_ext_%s.csv' % model_name)
 output_score = metric.calculate_metric_internal(refs, output, trained_smiles, loss, fcd)
 output_score['external_fcd'], output_score['external_jac'] = \
     metric.calculate_metric_external(refs_ext_fcd, refs_ext_fp, output_ext, fcd)

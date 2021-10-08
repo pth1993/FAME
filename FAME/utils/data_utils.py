@@ -119,6 +119,15 @@ def read_fragment_data(input_file, return_mol=False, max_length=12):
     return smiles_drug, smiles_frag, mol_drug, mol_frag
 
 
+def read_mol_from_file(input_file, num_sample):
+    data = []
+    with open(input_file) as f:
+        for line in f:
+            data.append(line.strip())
+    data = [data[i:(i+num_sample)] for i in range(0, len(data), num_sample)]
+    return data
+
+
 if __name__ == '__main__':
     # smi = 'CCCNC(C)C(=O)Nc1c(C)csc1C(=O)OC'
     # mol = convert_smiles_2_mol(smi)

@@ -1,6 +1,7 @@
 import numpy as np
 import random
-from utils import GeneMoleculeDataset, CustomCollateGE, read_pickle, L1000XPRDataset, write_mol_to_file, Metric
+from utils import GeneMoleculeDataset, CustomCollateGE, read_pickle, L1000XPRDataset, write_mol_to_file, Metric, \
+    read_mol_from_file
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -42,12 +43,12 @@ data_train = GeneMoleculeDataset(fragment_file='data/lincs/lincs_fragment_train.
                                  atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
                                  label_file='data/lincs/lincs_label_train.pkl')
 trained_smiles = set(data_train.smiles_drug)
-data_loader_train = DataLoader(data_train, batch_size=128, shuffle=True, collate_fn=CustomCollateGE())
-data_val = GeneMoleculeDataset(fragment_file='data/lincs/lincs_fragment_val.csv',
-                               ge_file='data/lincs/signature_mol_val_cl.csv',
-                               atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
-                               label_file='data/lincs/lincs_label_val.pkl')
-data_loader_val = DataLoader(data_val, batch_size=128, shuffle=False, collate_fn=CustomCollateGE())
+# data_loader_train = DataLoader(data_train, batch_size=128, shuffle=True, collate_fn=CustomCollateGE())
+# data_val = GeneMoleculeDataset(fragment_file='data/lincs/lincs_fragment_val.csv',
+#                                ge_file='data/lincs/signature_mol_val_cl.csv',
+#                                atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
+#                                label_file='data/lincs/lincs_label_val.pkl')
+# data_loader_val = DataLoader(data_val, batch_size=128, shuffle=False, collate_fn=CustomCollateGE())
 data_test = GeneMoleculeDataset(fragment_file='data/lincs/lincs_fragment_test.csv',
                                 ge_file='data/lincs/signature_mol_test_cl.csv',
                                 atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict,
@@ -80,28 +81,28 @@ fcd = FCD(device=device, n_jobs=8)
 
 data_excapedb = read_pickle('data/lincs/excapedb_calculated.pkl')
 
-checkpoint = torch.load('saved_model/pt8/FAME_0.ckpt', map_location=device)
-model = CFAMEFT(num_node_features=len(atom_dict['c2i']), num_edge_features=len(bond_dict['c2i']), n_gnn_layers=5,
-                gnn_hid_dim=64, latent_dim=32, emb_dim=32, out_dim=len(fragment_dict['c2i']),
-                n_rnn_layers=2, rnn_hid_dim=32, dropout=0.1, device=device, latent_dim_pt=64,
-                encoder_checkpoint=checkpoint['encoder_state_dict'], decoder_checkpoint=checkpoint['decoder_state_dict'])
+# checkpoint = torch.load('saved_model/pt8/FAME_0.ckpt', map_location=device)
+# model = CFAMEFT(num_node_features=len(atom_dict['c2i']), num_edge_features=len(bond_dict['c2i']), n_gnn_layers=5,
+#                 gnn_hid_dim=64, latent_dim=32, emb_dim=32, out_dim=len(fragment_dict['c2i']),
+#                 n_rnn_layers=2, rnn_hid_dim=32, dropout=0.1, device=device, latent_dim_pt=64,
+#                 encoder_checkpoint=checkpoint['encoder_state_dict'], decoder_checkpoint=checkpoint['decoder_state_dict'])
 
-optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
-
-if multi_gpu:
-    model = nn.DataParallel(model)
-model.to(device)
-
-train_loss_list = []
-val_loss_list = []
-test_loss_list = []
-train_kld_loss_list = []
-val_kld_loss_list = []
-test_kld_loss_list = []
-train_nll_loss_list = []
-val_nll_loss_list = []
-test_nll_loss_list = []
-best_val_loss = float('inf')
+# optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.0001)
+#
+# if multi_gpu:
+#     model = nn.DataParallel(model)
+# model.to(device)
+#
+# train_loss_list = []
+# val_loss_list = []
+# test_loss_list = []
+# train_kld_loss_list = []
+# val_kld_loss_list = []
+# test_kld_loss_list = []
+# train_nll_loss_list = []
+# val_nll_loss_list = []
+# test_nll_loss_list = []
+# best_val_loss = float('inf')
 
 # for e in range(n_epoch):
 #     model.train()
@@ -200,61 +201,64 @@ best_val_loss = float('inf')
 #                   columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
 #                   index=np.arange(len(train_loss_list))+1)
 # df.to_csv('output/ft1/%s' % log_file)
-
-best_epoch = 2
-
-# Evaluation
-if isinstance(model, nn.DataParallel):
-    checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
-    model.module.load_state_dict(checkpoint['model_state_dict'])
-else:
-    checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
-    model.load_state_dict(checkpoint['model_state_dict'])
-model.eval()
+#
+# best_epoch = 2
+#
+# # Evaluation
+# if isinstance(model, nn.DataParallel):
+#     checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+#     model.module.load_state_dict(checkpoint['model_state_dict'])
+# else:
+#     checkpoint = torch.load('saved_model/ft1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+#     model.load_state_dict(checkpoint['model_state_dict'])
+# model.eval()
 with torch.no_grad():
     output = []
     refs = []
     loss = []
     for i, b in enumerate(tqdm(data_loader_test)):
-        graph_drug = b['graph_drug'].to(device)
-        graph_frag = b['graph_frag'].to(device)
-        batch_frag = b['batch_frag']
-        ge = b['ge'].to(device)
-        neighbor = b['neighbor']
-        label = b['label'].to(device)
+        # graph_drug = b['graph_drug'].to(device)
+        # graph_frag = b['graph_frag'].to(device)
+        # batch_frag = b['batch_frag']
+        # ge = b['ge'].to(device)
+        # neighbor = b['neighbor']
+        # label = b['label'].to(device)
         ref = b['smiles_drug']
-        out, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
-        if isinstance(model, nn.DataParallel):
-            l, _ = model.module.loss(out, label, batch_frag, mu, logvar, False)
-            out = model.module.sample(ge, neighbor=neighbor, num_latent=20, num_sample_per_latent=20, max_length=12,
-                                      topk=20, atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
-        else:
-            l, _ = model.loss(out, label, batch_frag, mu, logvar, False)
-            out = model.sample(ge, neighbor=neighbor, num_latent=20, num_sample_per_latent=20, max_length=12, topk=20,
-                               atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
-        l = l.detach().cpu().tolist()
-        loss += l
-        output += out
+        # out, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
+        # if isinstance(model, nn.DataParallel):
+        #     l, _ = model.module.loss(out, label, batch_frag, mu, logvar, False)
+        #     out = model.module.sample(ge, neighbor=neighbor, num_latent=20, num_sample_per_latent=20, max_length=12,
+        #                               topk=20, atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
+        # else:
+        #     l, _ = model.loss(out, label, batch_frag, mu, logvar, False)
+        #     out = model.sample(ge, neighbor=neighbor, num_latent=20, num_sample_per_latent=20, max_length=12, topk=20,
+        #                        atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
+        # l = l.detach().cpu().tolist()
+        # loss += l
+        # output += out
         refs += ref
 
     output_ext = []
     refs_ext_fp = []
     refs_ext_fcd = []
     for i, b in enumerate(tqdm(data_loader_test_ext)):
-        ge = b['ge'].to(device)
+        # ge = b['ge'].to(device)
         target = b['target']
-        if isinstance(model, nn.DataParallel):
-            out = model.module.sample(ge, neighbor=neighbor, num_latent=70, num_sample_per_latent=70, max_length=12,
-                                      topk=20, atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
-        else:
-            out = model.sample(ge, neighbor=neighbor, num_latent=70, num_sample_per_latent=70, max_length=12, topk=20,
-                               atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
-        output_ext += out
+        # if isinstance(model, nn.DataParallel):
+        #     out = model.module.sample(ge, neighbor=neighbor, num_latent=70, num_sample_per_latent=70, max_length=12,
+        #                               topk=20, atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
+        # else:
+        #     out = model.sample(ge, neighbor=neighbor, num_latent=70, num_sample_per_latent=70, max_length=12, topk=20,
+        #                        atom_dict=atom_dict, bond_dict=bond_dict, fragment_dict=fragment_dict)
+        # output_ext += out
         refs_ext_fp += [data_excapedb[t]['morgan'] for t in target]
         refs_ext_fcd += [data_excapedb[t]['pref'] for t in target]
 
-write_mol_to_file(output, 'output/ft1/mol_test_%s.csv' % model_name)
-write_mol_to_file(output_ext, 'output/ft1/mol_test_ext_%s.csv' % model_name)
+# write_mol_to_file(output, 'output/ft1/mol_test_%s.csv' % model_name)
+# write_mol_to_file(output_ext, 'output/ft1/mol_test_ext_%s.csv' % model_name)
+
+output = read_mol_from_file('output/ft/mol_test_%s.csv'  % model_name, 400)
+output_ext = read_mol_from_file('output/ft/mol_test_%s.csv'  % model_name, 4900)
 output_score = metric.calculate_metric_internal(refs, output, trained_smiles, loss, fcd)
 output_score['external_fcd'], output_score['external_jac'] = \
     metric.calculate_metric_external(refs_ext_fcd, refs_ext_fp, output_ext, fcd)

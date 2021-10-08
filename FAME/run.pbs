@@ -8,7 +8,7 @@
 # Specify the amount of time for this job
 #SBATCH --time=12:00:00
 # Specify the maximum amount of physical memory required
-#SBATCH --mem=64GB
+#SBATCH --mem=256GB
 
 # Specify an account when more than one available
 #SBATCH --account=PCON0023

@@ -184,10 +184,10 @@ best_val_loss = float('inf')
 best_epoch = 7
 # Evaluation
 if isinstance(model, nn.DataParallel):
-    checkpoint = torch.load('saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+    checkpoint = torch.load('saved_model/rt1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
     model.module.load_state_dict(checkpoint['model_state_dict'])
 else:
-    checkpoint = torch.load('saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
+    checkpoint = torch.load('saved_model/rt1/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 with torch.no_grad():

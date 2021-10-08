@@ -83,105 +83,105 @@ val_nll_loss_list = []
 test_nll_loss_list = []
 best_val_loss = float('inf')
 
-# for e in range(n_epoch):
-#     model.train()
-#     train_loss = 0
-#     train_nll_loss = 0
-#     train_kld_loss = 0
-#     for i, b in enumerate(tqdm(data_loader_train)):
-#         graph_drug = b['graph_drug'].to(device)
-#         graph_frag = b['graph_frag'].to(device)
-#         batch_frag = b['batch_frag']
-#         ge = b['ge'].to(device)
-#         label = b['label'].to(device)
-#         output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
-#         if isinstance(model, nn.DataParallel):
-#             nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
-#         else:
-#             nll, kld = model.loss(output, label, batch_frag, mu, logvar)
-#         w = 0.1
-#         loss = nll + w * kld
-#         loss.backward()
-#         optimizer.step()
-#         train_loss += loss.item()
-#         train_nll_loss += nll.item()
-#         train_kld_loss += kld.item()
-#     print('Train loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (train_loss / (i+1), train_nll_loss / (i+1),
-#                                                                   train_kld_loss / (i+1)))
-#     train_loss_list.append(train_loss / (i+1))
-#     train_nll_loss_list.append(train_nll_loss / (i+1))
-#     train_kld_loss_list.append(train_kld_loss / (i+1))
-#
-#     model.eval()
-#     with torch.no_grad():
-#         val_loss = 0
-#         val_nll_loss = 0
-#         val_kld_loss = 0
-#         for i, b in enumerate(tqdm(data_loader_val)):
-#             graph_drug = b['graph_drug'].to(device)
-#             graph_frag = b['graph_frag'].to(device)
-#             batch_frag = b['batch_frag']
-#             ge = b['ge'].to(device)
-#             label = b['label'].to(device)
-#             output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
-#             if isinstance(model, nn.DataParallel):
-#                 nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
-#             else:
-#                 nll, kld = model.loss(output, label, batch_frag, mu, logvar)
-#             w = 0.1
-#             loss = nll + w * kld
-#             val_loss += loss.item()
-#             val_nll_loss += nll.item()
-#             val_kld_loss += kld.item()
-#         print('Val loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (val_loss / (i+1), val_nll_loss / (i+1),
-#                                                                     val_kld_loss / (i+1)))
-#         val_loss_list.append(val_loss / (i+1))
-#         val_nll_loss_list.append(val_nll_loss / (i+1))
-#         val_kld_loss_list.append(val_kld_loss / (i+1))
-#         if (val_loss / (i+1)) < best_val_loss:
-#             best_val_loss = val_loss / (i+1)
-#             best_epoch = e
-#             torch.save({'model_state_dict': model.module.state_dict() if isinstance(model, nn.DataParallel)
-#             else model.state_dict(), 'optimizer_state_dict': optimizer.state_dict()},
-#                        'saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch))
-#
-#     with torch.no_grad():
-#         test_loss = 0
-#         test_nll_loss = 0
-#         test_kld_loss = 0
-#         for i, b in enumerate(tqdm(data_loader_test)):
-#             graph_drug = b['graph_drug'].to(device)
-#             graph_frag = b['graph_frag'].to(device)
-#             batch_frag = b['batch_frag']
-#             ge = b['ge'].to(device)
-#             label = b['label'].to(device)
-#             output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
-#             if isinstance(model, nn.DataParallel):
-#                 nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
-#             else:
-#                 nll, kld = model.loss(output, label, batch_frag, mu, logvar)
-#             w = 0.1
-#             loss = nll + w * kld
-#             test_loss += loss.item()
-#             test_nll_loss += nll.item()
-#             test_kld_loss += kld.item()
-#         print('Test loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (test_loss / (i+1), test_nll_loss / (i+1),
-#                                                                     test_kld_loss / (i+1)))
-#         test_loss_list.append(test_loss / (i+1))
-#         test_nll_loss_list.append(test_nll_loss / (i+1))
-#         test_kld_loss_list.append(test_kld_loss / (i+1))
-#
-# print("Loss / NLL / KLD on val set by epoch %d (best val epoch): %.4f - %.4f - %.4f"
-#       % (best_epoch + 1, val_loss_list[best_epoch], val_nll_loss_list[best_epoch],
-#          val_kld_loss_list[best_epoch]))
-#
-# df = pd.DataFrame(list(zip(train_loss_list, train_nll_loss_list, train_kld_loss_list, val_loss_list,
-#                            val_nll_loss_list, val_kld_loss_list)),
-#                   columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
-#                   index=np.arange(len(train_loss_list))+1)
-# df.to_csv('output/rt/%s' % log_file)
+for e in range(n_epoch):
+    model.train()
+    train_loss = 0
+    train_nll_loss = 0
+    train_kld_loss = 0
+    for i, b in enumerate(tqdm(data_loader_train)):
+        graph_drug = b['graph_drug'].to(device)
+        graph_frag = b['graph_frag'].to(device)
+        batch_frag = b['batch_frag']
+        ge = b['ge'].to(device)
+        label = b['label'].to(device)
+        output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
+        if isinstance(model, nn.DataParallel):
+            nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
+        else:
+            nll, kld = model.loss(output, label, batch_frag, mu, logvar)
+        w = 0.1
+        loss = nll + w * kld
+        loss.backward()
+        optimizer.step()
+        train_loss += loss.item()
+        train_nll_loss += nll.item()
+        train_kld_loss += kld.item()
+    print('Train loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (train_loss / (i+1), train_nll_loss / (i+1),
+                                                                  train_kld_loss / (i+1)))
+    train_loss_list.append(train_loss / (i+1))
+    train_nll_loss_list.append(train_nll_loss / (i+1))
+    train_kld_loss_list.append(train_kld_loss / (i+1))
 
-best_epoch = 8
+    model.eval()
+    with torch.no_grad():
+        val_loss = 0
+        val_nll_loss = 0
+        val_kld_loss = 0
+        for i, b in enumerate(tqdm(data_loader_val)):
+            graph_drug = b['graph_drug'].to(device)
+            graph_frag = b['graph_frag'].to(device)
+            batch_frag = b['batch_frag']
+            ge = b['ge'].to(device)
+            label = b['label'].to(device)
+            output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
+            if isinstance(model, nn.DataParallel):
+                nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
+            else:
+                nll, kld = model.loss(output, label, batch_frag, mu, logvar)
+            w = 0.1
+            loss = nll + w * kld
+            val_loss += loss.item()
+            val_nll_loss += nll.item()
+            val_kld_loss += kld.item()
+        print('Val loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (val_loss / (i+1), val_nll_loss / (i+1),
+                                                                    val_kld_loss / (i+1)))
+        val_loss_list.append(val_loss / (i+1))
+        val_nll_loss_list.append(val_nll_loss / (i+1))
+        val_kld_loss_list.append(val_kld_loss / (i+1))
+        if (val_loss / (i+1)) < best_val_loss:
+            best_val_loss = val_loss / (i+1)
+            best_epoch = e
+            torch.save({'model_state_dict': model.module.state_dict() if isinstance(model, nn.DataParallel)
+            else model.state_dict(), 'optimizer_state_dict': optimizer.state_dict()},
+                       'saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch))
+
+    with torch.no_grad():
+        test_loss = 0
+        test_nll_loss = 0
+        test_kld_loss = 0
+        for i, b in enumerate(tqdm(data_loader_test)):
+            graph_drug = b['graph_drug'].to(device)
+            graph_frag = b['graph_frag'].to(device)
+            batch_frag = b['batch_frag']
+            ge = b['ge'].to(device)
+            label = b['label'].to(device)
+            output, mu, logvar, batch_frag = model.forward(graph_drug, graph_frag, batch_frag, ge, label)
+            if isinstance(model, nn.DataParallel):
+                nll, kld = model.module.loss(output, label, batch_frag, mu, logvar)
+            else:
+                nll, kld = model.loss(output, label, batch_frag, mu, logvar)
+            w = 0.1
+            loss = nll + w * kld
+            test_loss += loss.item()
+            test_nll_loss += nll.item()
+            test_kld_loss += kld.item()
+        print('Test loss: %.4f - NLL loss: %.4f - KLD loss: %.4f' % (test_loss / (i+1), test_nll_loss / (i+1),
+                                                                    test_kld_loss / (i+1)))
+        test_loss_list.append(test_loss / (i+1))
+        test_nll_loss_list.append(test_nll_loss / (i+1))
+        test_kld_loss_list.append(test_kld_loss / (i+1))
+
+print("Loss / NLL / KLD on val set by epoch %d (best val epoch): %.4f - %.4f - %.4f"
+      % (best_epoch + 1, val_loss_list[best_epoch], val_nll_loss_list[best_epoch],
+         val_kld_loss_list[best_epoch]))
+
+df = pd.DataFrame(list(zip(train_loss_list, train_nll_loss_list, train_kld_loss_list, val_loss_list,
+                           val_nll_loss_list, val_kld_loss_list)),
+                  columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
+                  index=np.arange(len(train_loss_list))+1)
+df.to_csv('output/rt/%s' % log_file)
+
+# best_epoch = 8
 # Evaluation
 if isinstance(model, nn.DataParallel):
     checkpoint = torch.load('saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch), map_location=device)

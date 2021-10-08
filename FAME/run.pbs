@@ -2,11 +2,11 @@
 # This is a sample PBS script file to train a simple convnet on the MNIST dataset.
 
 # Set job name
-#SBATCH --job-name=FAME
+#SBATCH --job-name=CFAME
 # Specify the number of nodes and processors and gpus per nodes
 #SBATCH --nodes=1 --ntasks-per-node=16 --gpus-per-node=1
 # Specify the amount of time for this job
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 # Specify the maximum amount of physical memory required
 #SBATCH --mem=128GB
 
@@ -22,4 +22,4 @@ source activate molgen
 
 ## Do your things
 cd $SLURM_SUBMIT_DIR # Goto the directory where the job is submitted
-python main_fame.py
+python main_cfame.py

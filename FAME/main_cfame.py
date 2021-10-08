@@ -143,7 +143,7 @@ for e in range(n_epoch):
             best_epoch = e
             torch.save({'model_state_dict': model.module.state_dict() if isinstance(model, nn.DataParallel)
             else model.state_dict(), 'optimizer_state_dict': optimizer.state_dict()},
-                       'saved_model/rt/%s_%d.ckpt' % (model_name, best_epoch))
+                       'saved_model/rt1/%s_%d.ckpt' % (model_name, best_epoch))
 
     with torch.no_grad():
         test_loss = 0
@@ -179,7 +179,7 @@ df = pd.DataFrame(list(zip(train_loss_list, train_nll_loss_list, train_kld_loss_
                            val_nll_loss_list, val_kld_loss_list)),
                   columns=['train_loss', 'train_nll_loss', 'train_kld_loss', 'val_loss', 'val_nll_loss', 'val_kld_loss'],
                   index=np.arange(len(train_loss_list))+1)
-df.to_csv('output/rt/%s' % log_file)
+df.to_csv('output1/rt/%s' % log_file)
 
 # best_epoch = 8
 # Evaluation
@@ -232,8 +232,8 @@ with torch.no_grad():
         refs_ext_fp += [data_excapedb[t]['morgan'] for t in target]
         refs_ext_fcd += [data_excapedb[t]['pref'] for t in target]
 
-write_mol_to_file(output, 'output/rt/mol_test_%s.csv' % model_name)
-write_mol_to_file(output_ext, 'output/rt/mol_test_ext_%s.csv' % model_name)
+write_mol_to_file(output, 'output/rt1/mol_test_%s.csv' % model_name)
+write_mol_to_file(output_ext, 'output/rt1/mol_test_ext_%s.csv' % model_name)
 output_score = metric.calculate_metric_internal(refs, output, trained_smiles, loss, fcd)
 output_score['external_fcd'], output_score['external_jac'] = \
 metric.calculate_metric_external(refs_ext_fcd, refs_ext_fp, output_ext, fcd)

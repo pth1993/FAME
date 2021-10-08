@@ -22,4 +22,4 @@ source activate molgen
 
 ## Do your things
 cd $SLURM_SUBMIT_DIR # Goto the directory where the job is submitted
-python main_cfame.py
+python main_cfameft.py

@@ -1,16 +1,24 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.nn import GINEConv
-from torch_scatter import scatter
-from torch.nn import ModuleList, Sequential, Linear, BatchNorm1d, ReLU
 import numpy as np
-import random
-from torch_geometric.data import Data, Batch
+from torch_geometric.data import Data
 from rdkit import Chem
 
 
 dummy = Chem.MolFromSmiles('[*]')
+
+
+class MolData(Data):
+    def __init__(self, edge_index=None, x=None, edge_attr=None):
+        super().__init__()
+        self.edge_index = edge_index
+        self.x = x
+        self.edge_attr = edge_attr
+
+    def __cat_dim__(self, key, value, *args, **kwargs):
+        if key == ('edge_index' or 'edge_attr'):
+            return 1
+        else:
+            return 0
 
 
 def convert_mol_2_graph_pyg(mol, atom_dict, bond_dict):
@@ -29,20 +37,6 @@ def convert_mol_2_graph_pyg(mol, atom_dict, bond_dict):
         x = torch.tensor(x, dtype=torch.float32)
         graph = MolData(x=x, edge_index=edge_index, edge_attr=edge_attr)
         return graph
-
-
-class MolData(Data):
-    def __init__(self, edge_index=None, x=None, edge_attr=None):
-        super().__init__()
-        self.edge_index = edge_index
-        self.x = x
-        self.edge_attr = edge_attr
-
-    def __cat_dim__(self, key, value, *args, **kwargs):
-        if key == ('edge_index' or 'edge_attr'):
-            return 1
-        else:
-            return 0
 
 
 def convert_smiles_2_mol(smiles):
@@ -122,7 +116,6 @@ def reconstruct(frags):
         mol = join_molecules(frags[0], frags[1])
         for i, frag in enumerate(frags[2:]):
             mol = join_molecules(mol, frag)
-        # see if there are kekulization/valence errors
         mol_to_smiles(mol)
         return mol, frags
     except Exception:

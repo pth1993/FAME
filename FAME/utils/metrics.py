@@ -1,12 +1,10 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import MACCSkeys
-from rdkit.Chem.Fraggle import FraggleSim
 from rdkit import RDLogger
 import numpy as np
 import torch
 from tqdm import tqdm
-import math
 from scipy.spatial import distance
 
 
@@ -188,97 +186,3 @@ class Metric(object):
         if p != 1:
             agg_tanimoto = (agg_tanimoto)**(1/p)
         return np.mean(agg_tanimoto)
-
-    #
-    # def calculate_diversity_ex(self, reference_fps, sample_fps):
-    #     return np.mean(np.min(cdist(reference_fps, sample_fps, 'jaccard'), axis=1))
-    #
-    # def calculate_similarity_loss(self, reference_fps, sample_fps_per_example):
-    #     score = []
-    #     for i, r in enumerate(reference_fps):
-    #         if len(sample_fps_per_example[i]) == 0:
-    #             score.append(0.0)
-    #         else:
-    #             score.append(np.max(1 - cdist([r], sample_fps_per_example[i], 'jaccard')))
-    #     return np.mean(score)
-    #
-    # def calculate_similarity_fraggle(self, reference_mol, sample_mol, num_sample):
-    #     sample_mol_per_example = self.reshape_per_example(sample_mol, len(sample_mol) / num_sample)
-    #     score = []
-    #     for i, r in enumerate(reference_mol):
-    #         sc = []
-    #         try:
-    #             FraggleSim.GetFraggleSimilarity(r, r)
-    #             for s in sample_mol_per_example[i]:
-    #                 if s is not None:
-    #                     try:
-    #                         sc.append(FraggleSim.GetFraggleSimilarity(r, s)[0])
-    #                     except:
-    #                         # print('Cannot get fraggle for sample')
-    #                         pass
-    #             if len(sc) == 0:
-    #                 score.append(0.0)
-    #             else:
-    #                 score.append(np.max(sc))
-    #         except:
-    #             # print('Cannot get fraggle for reference')
-    #             pass
-    #     return np.mean(score)
-    #
-    # def calculate_metric(self, reference_string, sample_string):
-    #     num_sample = len(sample_string) / len(reference_string)
-    #     print('Smiles to Mol')
-    #     reference_mol = self.smiles2mol(reference_string)
-    #     sample_mol = self.smiles2mol(sample_string)
-    #     print('Smiles to Canonical Smiles')
-    #     reference_string = self.get_canon_smiles(reference_mol)
-    #     sample_string = self.get_canon_smiles(sample_mol)
-    #     print('Smiles to Fingerprint')
-    #     reference_fps_morgan, reference_fps_maccs = self.get_fingerprint_reference(reference_string)
-    #     sample_fps_morgan, sample_fps_morgan_per_example, sample_fps_maccs, sample_fps_maccs_per_example = \
-    #         self.get_fingerprint_sample(sample_string, num_sample)
-    #     if set(sample_string) == {None}:
-    #         return {'valid': 0, 'novel': 0, 'unique': 0, 'din': 0, 'dex': 0, 'supervised morgan': 0,
-    #                 'supervised maccs': 0, 'supervised fraggle': 0}
-    #     print('Calculate Valid')
-    #     if self.config['valid']:
-    #         valid = self.calculate_valid(sample_string)
-    #     else:
-    #         valid = 'N/A'
-    #     print('Calculate Novel')
-    #     if self.config['novel']:
-    #         novel = self.calculate_novel(reference_string, sample_string)
-    #     else:
-    #         novel = 'N/A'
-    #     print('Calculate Unique')
-    #     if self.config['unique']:
-    #         unique = self.calculate_unique(sample_string)
-    #     else:
-    #         unique = 'N/A'
-    #     print('Calculate din')
-    #     if self.config['din']:
-    #         din = self.calculate_diversity_in(sample_fps_morgan)
-    #     else:
-    #         din = 'N/A'
-    #     print('Calculate dex')
-    #     if self.config['dex']:
-    #         dex = self.calculate_diversity_ex(reference_fps_morgan, sample_fps_morgan)
-    #     else:
-    #         dex = 'N/A'
-    #     print('Calculate morgan')
-    #     if self.config['morgan']:
-    #         sim_morgan = self.calculate_similarity_loss(reference_fps_morgan, sample_fps_morgan_per_example)
-    #     else:
-    #         sim_morgan = 'N/A'
-    #     print('Calculate maccs')
-    #     if self.config['maccs']:
-    #         sim_maccs = self.calculate_similarity_loss(reference_fps_maccs, sample_fps_maccs_per_example)
-    #     else:
-    #         sim_maccs = 'N/A'
-    #     print('Calculate fraggle')
-    #     if self.config['fraggle']:
-    #         sim_fraggle = self.calculate_similarity_fraggle(reference_mol, sample_mol, num_sample)
-    #     else:
-    #         sim_fraggle = 'N/A'
-    #     return {'valid': valid, 'novel': novel, 'unique': unique, 'din': din, 'dex': dex,
-    #             'supervised morgan': sim_morgan, 'supervised maccs': sim_maccs, 'supervised fraggle': sim_fraggle}

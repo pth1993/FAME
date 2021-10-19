@@ -1,12 +1,10 @@
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
 import json
 import ast
-import re
 import pickle
 from rdkit import Chem
-from torch_geometric.data import Data, Batch
+from torch_geometric.data import Data
 import torch
 from rdkit import RDLogger
 
@@ -126,33 +124,3 @@ def read_mol_from_file(input_file, num_sample):
             data.append(line.strip())
     data = [data[i:(i+num_sample)] for i in range(0, len(data), num_sample)]
     return data
-
-
-if __name__ == '__main__':
-    # smi = 'CCCNC(C)C(=O)Nc1c(C)csc1C(=O)OC'
-    # mol = convert_smiles_2_mol(smi)
-    # convert_mol_2_graph_pyg(mol, None, None)
-    atom_dict = read_pickle('../data/atom_dict.pkl')
-    bond_dict = read_pickle('../data/bond_dict.pkl')
-    for k in bond_dict['c2i'].keys():
-        print(str(k))
-    # # _, smiles_train = read_lincs_mol_data('../data/lincs/signature_mol_train.csv', filter=None)
-    # # _, smiles_val = read_lincs_mol_data('../data/lincs/signature_mol_val.csv', filter=None)
-    # _, smiles_test = read_lincs_mol_data('../data/lincs/signature_mol_test.csv', filter=None)
-    # smiles = smiles_train + smiles_val + smiles_test
-    # smiles = smiles_test
-    # smiles = ['CCCNC(C)C(=O)Nc1c(C)csc1C(=O)OC']
-    # mols = [convert_smiles_2_mol(s) for s in smiles]
-    # [convert_mol_2_graph_pyg(mols[0], atom_dict, bond_dict) for i in range(1000)]
-    # smiles_drug, smiles_frag, mol_drug, mol_frag = read_lincs_fragment_data('../data/lincs/lincs_fragment_val.csv')
-    # # print(smiles_drug[0], smiles_frag[0], mol_drug[0], mol_frag[0])
-    # # data_list = [convert_mol_2_graph_pyg(mol, atom_dict, bond_dict) for mol in mol_drug[:4]]
-    # # b = Batch.from_data_list(data_list)
-    # # for d in data_list:
-    # #     print(d)
-    # # print(b.edge_index)
-    # data_list = [create_pyg_data(m_drug, m_frag, atom_dict, bond_dict) for m_drug, m_frag in zip(mol_drug[:4], mol_frag[:4])]
-    # for d in data_list:
-    #     print(d)
-    # b = Batch.from_data_list(data_list)
-    # print(b)

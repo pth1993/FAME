@@ -16,3 +16,4 @@ FAME/data/*
 FAME/output/*
 FAME/saved_model/*
 FAME/tmp.py
+archived/*

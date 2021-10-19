@@ -23,11 +23,11 @@ You must have them installed before using **FAME**.
 The simple way to install them is using conda:
 
 ```sh
-    $ conda create -n fame python=3.7
-	$ conda install numpy scipy pandas tqdm scikit-learn
-	$ conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch-lts -c nvidia
-	$ conda install -c conda-forge rdkit
-	$ conda install pyg -c pyg -c conda-forge
+$ conda create -n fame python=3.7
+$ conda install numpy scipy pandas tqdm scikit-learn
+$ conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch-lts -c nvidia
+$ conda install -c conda-forge rdkit
+$ conda install pyg -c pyg -c conda-forge
 ```
 
 ## 5. Usage
@@ -37,7 +37,7 @@ The simple way to install them is using conda:
 To download preprocessed datasets used in our experiments (i.e., LINCS L1000, ChemBL, Excape), please run the following script.
 
 ```sh
-    $ bash data_download.sh 
+$ bash data_download.sh 
 ```
 
 ### 5.2. Training FAME
@@ -45,5 +45,5 @@ To download preprocessed datasets used in our experiments (i.e., LINCS L1000, Ch
 The training script for **FAME** is located at the main folder.
 
 ```sh
-    $ python train.py 
+$ python train.py 
 ```

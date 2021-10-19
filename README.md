@@ -4,17 +4,10 @@ SDM 2022 submission's code
 -----------------------------------------------------------------
 
 ## 1. Introduction
-**FAME** is a Python implementation of the multi-view multi-task network for predicting the onset of multiple
-complications. In particular, **MuViTaNet** complements patient representation by using a multi-view encoder to effectively
-extract information by considering clinical data as both sequences of clinical visits and sets of clinical features.
-In addition, it leverages additional information from both related labeled and unlabeled datasets to generate more
-generalized representations by using a new multi-task learning scheme for making more accurate predictions.
+**FAME** is a Python implementation of the deep graph generative model targeting phenotypic molecular design, in particular gene expression-based molecular design. **FAME** leverages a conditional variational autoencoder framework to learn the conditional distribution generating molecules from gene expression profiles. To tackle the difficulties when learning this distribution due to the complexity of the molecular space and the noisy phenomenon in gene expression data, first, a gene expression denoising (GED) model using constrative objective function is proposed to reduce noise from gene expression data before inputting to **FAME**. Second, **FAME** is designed to treat molecules as the sequences of fragments and then learn to generate these fragments in autoregressive manner. By leveraging this fragment-based generation strategy and the denoised gene expression profiles, **FAME** can generate novel molecules with a high validity rate and desired biological activity. 
 
-The experimental results show that **MuViTaNet** outperforms existing methods for profiling the development of
-cardiac complications in breast cancer survivors. Furthermore, thanks to its multi-view multi-task architecture,
-**MuViTaNet** also provides an effective mechanism for interpreting its predictions in multiple perspectives, thereby
-helping clinicians discover the underlying mechanism triggering the onset and for making better clinical treatments in
-real-world scenarios.
+
+The experimental results show that **FAME** outperforms existing methods including both SMILES-based and graph-based deep generative models for phenotypic molecular design. Furthermore, the effective mechanism for reducing noise in gene expression data proposed in our study can be applied and then adds more values to other phenotypic drug discovery applications.
 
 ## 3. FAME
 
@@ -38,7 +31,7 @@ The simple way to install them is using conda:
 
 We do not provide the insurance claim data itself due to copyright issue.
 
-### 5.2. Training MuViTaNet
+### 5.2. Training FAME
 
 The training script for **FAME** is located at the main folder.
 

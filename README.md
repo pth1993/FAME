@@ -24,6 +24,7 @@ The simple way to install them is using conda:
 
 ```sh
 $ conda create -n fame python=3.7
+$ conda activate fame
 $ conda install numpy scipy pandas tqdm scikit-learn
 $ conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch-lts -c nvidia
 $ conda install -c conda-forge rdkit

@@ -29,22 +29,16 @@ The simple way to install them is using conda:
 
 ### 5.1. Data
 
-We do not provide the insurance claim data itself due to copyright issue.
+To download preprocessed datasets used in our experiments (i.e., LINCS L1000, ChemBL, Excape), please run the following script.
+
+```sh
+    $ bash data_download.sh 
+```
 
 ### 5.2. Training FAME
 
 The training script for **FAME** is located at the main folder.
 
 ```sh
-    $ python main_fame.py 
+    $ python train.py 
 ```
-
-Arguments in this scripts:
-
-* ``--fold``:       data fold in cross-validation setting
-* ``--batch_size``:         batch size used for training
-* ``--max_epoch``:        maximum number of training iterations
-* ``--model_name``:        name of model
-* ``--gpu``:      gpu id
-* ``--warm_start``: train model from pretrained weights
-* ``--inference``:       use model in inference stage

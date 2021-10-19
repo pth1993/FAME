@@ -31,6 +31,7 @@ $ conda install -c conda-forge rdkit
 $ conda install pyg -c pyg -c conda-forge
 ```
 
+Note that the command for pytorch installation depends on your environment. Please visit [PyTorch Homepage](https://pytorch.org/get-started/locally/) for more details.
 ## 5. Usage
 
 ### 5.1. Data

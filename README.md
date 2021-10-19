@@ -23,8 +23,13 @@ You must have them installed before using **FAME**.
 The simple way to install them is using conda:
 
 ```sh
-	$ conda install numpy scipy pandas tqdm scikit-learn rdkit pyg pytorch
+    $ conda create -n fame python=3.7
+	$ conda install numpy scipy pandas tqdm scikit-learn
+	$ conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch-lts -c nvidia
+	$ conda install -c conda-forge rdkit
+	$ conda install pyg -c pyg -c conda-forge
 ```
+
 ## 5. Usage
 
 ### 5.1. Data

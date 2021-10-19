@@ -8,6 +8,6 @@ else
     c=`grep -o "confirm=...." tmp`
     wget --load-cookie cookie.txt --save-cookie cookie.txt "${url}&$c" -O "${file}"
     rm cookie.txt tmp
-    unzip "${file}" -d "${dir}"
+    unzip "${file}"
     rm "${file}"
 fi
